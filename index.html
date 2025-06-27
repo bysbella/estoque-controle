@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Materiais por Obra</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background: #eee;
+    }
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 4px;
+    }
+    .saldo-ok {
+      background-color: #d4edda;
+      color: #155724;
+      font-weight: bold;
+    }
+    .saldo-negativo {
+      background-color: #f8d7da;
+      color: #721c24;
+      font-weight: bold;
+    }
+    .btn-salvar {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .aba-materiais, .aba-obras {
+      margin-top: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .input-pesquisa {
+      width: 300px;
+      padding: 8px;
+      margin-top: 10px;
+      font-size: 16px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .obra-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+    }
+    .obra-detalhes {
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px dashed #aaa;
+      margin-top: 10px;
+      position: relative;
+    }
+    .btn-excluir-obra {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: #888;
+      cursor: pointer;
+      user-select: none;
+    }
+    .btn-excluir-obra:hover {
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="aba-materiais">
+    <h1>Controle de Materiais</h1>
+    <input 
+      type="text" 
+      id="filtro-material" 
+      placeholder="Buscar código ou material..." 
+      oninput="filtrarMateriais()" 
+      class="input-pesquisa"
+    />
+  </div>
+
+  <table id="tabela-materiais">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Material</th>
+        <th>Qtd Atual</th>
+        <th>Qtd Chegou</th>
+        <th>Qtd Saiu</th>
+        <th>Obra Nº</th>
+        <th>Qtd Voltou</th>
+        <th>Saldo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-codigo="20009716">
+        <td>20009716</td>
+        <td>CAB 70MM2</td>
+        <td><input type="number" class="qtd-atual"></td>
+        <td><input type="number" class="qtd-chegou"></td>
+        <td><input type="number" class="qtd-saiu"></td>
+        <td><input type="text" class="n-obra"></td>
+        <td><input type="number" class="qtd-voltou"></td>
+        <td class="saldo"></td>
+      </tr>
+      <tr data-codigo="15004882">
+        <td>15004882</td>
+        <td>FIO AÇO</td>
+        <td><input type="number" class="qtd-atual"></td>
+        <td><input type="number" class="qtd-chegou"></td>
+        <td><input type="number" class="qtd-saiu"></td>
+        <td><input type="text" class="n-obra"></td>
+        <td><input type="number" class="qtd-voltou"></td>
+        <td class="saldo"></td>
+      </tr>
+      <tr data-codigo="20000102">
+        <td>20000102</td>
+        <td>CORDOALHA</td>
+        <td><input type="number" class="qtd-atual"></td>
+        <td><input type="number" class="qtd-chegou"></td>
+        <td><input type="number" class="qtd-saiu"></td>
+        <td><input type="text" class="n-obra"></td>
+        <td><input type="number" class="qtd-voltou"></td>
+        <td class="saldo"></td>
+      </tr>
+      <tr data-codigo="15005579">
+        <td>15005579</td>
+        <td>LUVA EMENDA</td>
+        <td><input type="number" class="qtd-atual"></td>
+        <td><input type="number" class="qtd-chegou"></td>
+        <td><input type="number" class="qtd-saiu"></td>
+        <td><input type="text" class="n-obra"></td>
+        <td><input type="number" class="qtd-voltou"></td>
+        <td class="saldo"></td>
+      </tr>
+      <tr data-codigo="15010262">
+        <td>15010262</td>
+        <td>CRUZETA POSTE</td>
+        <td><input type="number" class="qtd-atual"></td>
+        <td><input type="number" class="qtd-chegou"></td>
+        <td><input type="number" class="qtd-saiu"></td>
+        <td><input type="text" class="n-obra"></td>
+        <td><input type="number" class="qtd-voltou"></td>
+        <td class="saldo"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button class="btn-salvar" onclick="salvarDados()">Salvar Movimentação</button>
+
+  <div class="aba-obras">
+    <h2>Obras Cadastradas</h2>
+    <input 
+      type="text" 
+      id="busca-obra" 
+      placeholder="Buscar por número da obra..." 
+      oninput="filtrarObras()"
+      class="input-pesquisa"
+    >
+    <div id="lista-obras"></div>
+  </div>
+
+  <script>
+    function salvarDados() {
+      const linhas = document.querySelectorAll("#tabela-materiais tbody tr");
+      const dataHoje = new Date().toLocaleDateString();
+      const obras = {};
+      const totais = JSON.parse(localStorage.getItem("quantidade_atual")) || {};
+
+      linhas.forEach(linha => {
+        const codigo = linha.dataset.codigo;
+        const material = linha.children[1].textContent;
+        const atual = parseInt(linha.querySelector(".qtd-atual").value) || 0;
+        const chegou = parseInt(linha.querySelector(".qtd-chegou").value) || 0;
+        const saiu = parseInt(linha.querySelector(".qtd-saiu").value) || 0;
+        const voltou = parseInt(linha.querySelector(".qtd-voltou").value) || 0;
+        const obra = linha.querySelector(".n-obra").value.trim();
+
+        const saldo = atual + chegou - saiu + voltou;
+        const saldoCell = linha.querySelector(".saldo");
+        saldoCell.textContent = saldo;
+        saldoCell.className = saldo < 0 ? "saldo saldo-negativo" : "saldo saldo-ok";
+
+        totais[codigo] = saldo;
+
+        if (obra) {
+          if (!obras[obra]) obras[obra] = [];
+          obras[obra].push({ codigo, material, saiu, voltou, data: dataHoje });
+        }
+      });
+
+      localStorage.setItem("quantidade_atual", JSON.stringify(totais));
+
+      for (let obra in obras) {
+        const chave = `obra_${obra}`;
+        const registros = JSON.parse(localStorage.getItem(chave)) || [];
+        registros.push({ data: dataHoje, materiais: obras[obra] });
+        localStorage.setItem(chave, JSON.stringify(registros));
+      }
+
+      alert("Movimentação salva com sucesso!");
+      listarObras();
+      preencherQuantidades();
+    }
+
+    function preencherQuantidades() {
+      const totais = JSON.parse(localStorage.getItem("quantidade_atual")) || {};
+      const linhas = document.querySelectorAll("#tabela-materiais tbody tr");
+      linhas.forEach(linha => {
+        const codigo = linha.dataset.codigo;
+        const campoAtual = linha.querySelector(".qtd-atual");
+        if (totais[codigo] !== undefined) {
+          campoAtual.value = totais[codigo];
+        }
+      });
+    }
+
+    window.onload = () => {
+      listarObras();
+      preencherQuantidades();
+    };
+
+    function listarObras() {
+      const lista = document.getElementById("lista-obras");
+      lista.innerHTML = "";
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const chave = localStorage.key(i);
+        if (chave.startsWith("obra_")) {
+          const numObra = chave.replace("obra_", "");
+          const dados = JSON.parse(localStorage.getItem(chave));
+
+          const div = document.createElement("div");
+          div.className = "obra-card";
+
+          const btnExcluir = document.createElement("button");
+          btnExcluir.textContent = "×";
+          btnExcluir.title = "Excluir Obra";
+          btnExcluir.className = "btn-excluir-obra";
+          btnExcluir.onclick = (e) => {
+            e.stopPropagation();
+            excluirObra(numObra);
+          };
+
+          div.textContent = `Obra ${numObra} - ${dados[dados.length - 1].data}`;
+          div.appendChild(btnExcluir);
+          div.onclick = () => toggleDetalhes(div, numObra);
+
+          lista.appendChild(div);
+        }
+      }
+    }
+
+    function excluirObra(numObra) {
+      if (confirm(`Tem certeza que deseja excluir a obra ${numObra}?`)) {
+        localStorage.removeItem(`obra_${numObra}`);
+        listarObras();
+      }
+    }
+
+    function toggleDetalhes(card, numObra) {
+      const existente = card.querySelector(".obra-detalhes");
+      if (existente) {
+        existente.remove();
+        return;
+      }
+      mostrarDetalhes(card, numObra);
+    }
+
+    function mostrarDetalhes(card, numObra) {
+      const chave = `obra_${numObra}`;
+      const dados = JSON.parse(localStorage.getItem(chave));
+      const ultima = dados[dados.length - 1];
+
+      const detalhesDiv = document.createElement("div");
+      detalhesDiv.className = "obra-detalhes";
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = `Obra ${numObra} - ${ultima.data}`;
+
+      const tabela = document.createElement("table");
+      tabela.innerHTML = `<tr><th>Código</th><th>Material</th><th>Qtd Usada</th><th>Qtd Voltou</th></tr>`;
+
+      ultima.materiais.forEach(mat => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${mat.codigo}</td>
+          <td>${mat.material}</td>
+          <td>${mat.saiu || 0}</td>
+          <td>${mat.voltou || 0}</td>
+        `;
+        tabela.appendChild(tr);
+      });
+
+      detalhesDiv.appendChild(titulo);
+      detalhesDiv.appendChild(tabela);
+      card.appendChild(detalhesDiv);
+      detalhesDiv.style.display = "block";
+    }
+
+    function filtrarObras() {
+      const termo = document.getElementById("busca-obra").value.trim();
+      const cards = document.querySelectorAll(".obra-card");
+      cards.forEach(card => {
+        card.style.display = card.textContent.toLowerCase().includes(termo.toLowerCase()) ? "block" : "none";
+      });
+    }
+
+    function filtrarMateriais() {
+      const filtro = document.getElementById('filtro-material').value.toLowerCase();
+      const linhas = document.querySelectorAll('#tabela-materiais tbody tr');
+
+      linhas.forEach(linha => {
+        const codigo = linha.querySelector('td:nth-child(1)').textContent.toLowerCase();
+        const material = linha.querySelector('td:nth-child(2)').textContent.toLowerCase();
+
+        if (codigo.includes(filtro) || material.includes(filtro)) {
+          linha.style.display = '';
+        } else {
+          linha.style.display = 'none';
+        }
+      });
+    }
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyCVSoC4vffxu9SMTPbi8I8PdAmRPrs8Wdk",
+  authDomain: "controle-estoque-61f13.firebaseapp.com",
+  projectId: "controle-estoque-61f13",
+  storageBucket: "controle-estoque-61f13.appspot.com",
+  messagingSenderId: "421561124999",
+  appId: "1:421561124999:web:cd5b94c0efabdf27f1022"
+};
+  </script>
+
+</body>
+</html>
